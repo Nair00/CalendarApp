@@ -2,12 +2,15 @@ package com.example.calendarapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.github.tlaabs.timetableview.Schedule;
 import com.github.tlaabs.timetableview.Time;
 import com.github.tlaabs.timetableview.TimetableView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -16,6 +19,7 @@ import java.util.TimeZone;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     TimetableView timetableView;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +30,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void init(){
         timetableView = findViewById(R.id.timetable);
-        timetableView.setHeaderHighlight(Calendar.DAY_OF_WEEK - 1);
+        fab = findViewById(R.id.add_task_button);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
+                startActivity(intent);
+            }
+        });
 
+        timetableView.setHeaderHighlight(Calendar.DAY_OF_WEEK - 1);
         timetableView.setOnStickerSelectEventListener(new TimetableView.OnStickerSelectedListener() {
             @Override
             public void OnStickerSelected(int idx, ArrayList<Schedule> schedules) {
-
             }
         });
         addTask();
@@ -39,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v){
-
+        Toast toast = Toast.makeText(getApplicationContext(), "CLICK!", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     private void addTask(){
@@ -54,18 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         schedules.add(schedule);
 
         timetableView.add(schedules);
-
-        Schedule schedule2 = new Schedule();
-        schedule2.setClassTitle("Data Structure"); // sets subject
-        schedule2.setClassPlace("IT-601"); // sets place
-        schedule2.setProfessorName("Won Kim"); // sets professor
-        schedule2.setDay(2);
-        schedule2.setStartTime(new Time(14,0)); // sets the beginning of class time (hour,minute)
-        schedule2.setEndTime(new Time(15,30)); // sets the end of class time (hour,minute)
-        ArrayList<Schedule> scheduless = new ArrayList<>();
-        scheduless.add(schedule2);
-
-        timetableView.add(scheduless);
 //.. add one or more schedules
     }
 }

@@ -19,16 +19,29 @@
         android:layout_weight="0.5"
         />
 
-    <com.github.tlaabs.timetableview.TimetableView
-        android:id="@+id/timetable"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5.5"
-        app:start_time="7"
-        app:column_count="8"
-        app:row_count="16"
-        app:header_highlight_type="color"
-        app:header_title="@array/header_days"/>
+        android:layout_weight="5.5">
 
+        <com.github.tlaabs.timetableview.TimetableView
+            android:id="@+id/timetable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:start_time="7"
+            app:column_count="8"
+            app:row_count="16"
+            app:header_highlight_type="color"
+            app:header_title="@array/header_days"/>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_task_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:backgroundTint="@color/blue"
+            android:layout_margin="16dp"
+            app:srcCompat="@drawable/ic_baseline_add_24"
+            app:tint="@color/white"/>
+    </FrameLayout>
 </LinearLayout>
