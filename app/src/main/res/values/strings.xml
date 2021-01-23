@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">CalendarApp</string>
+    <string-array name="header_days">
+        <item></item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
 </resources>
