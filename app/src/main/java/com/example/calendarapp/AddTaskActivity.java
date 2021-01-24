@@ -14,6 +14,8 @@ import com.github.tlaabs.timetableview.Schedule;
 import com.github.tlaabs.timetableview.Time;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class AddTaskActivity extends AppCompatActivity {
     EditText className;
@@ -28,6 +30,7 @@ public class AddTaskActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
 
         className = findViewById(R.id.task_name);
         classroomName = findViewById(R.id.room_name);
@@ -36,11 +39,17 @@ public class AddTaskActivity extends AppCompatActivity {
         startTime = findViewById(R.id.start_time);
         endTime = findViewById(R.id.end_time);
         addButton = findViewById(R.id.add_button);
+        String[] pickerVals = new String[] {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+        date.setMinValue(1);
+        date.setMaxValue(7);
+        date.setDisplayedValues(pickerVals);
+        date.setValue(calendar.get(Calendar.DAY_OF_WEEK));
 
         startTime.setIs24HourView(true);
         endTime.setIs24HourView(true);
-        date.setMinValue(1);
-        date.setMaxValue(7);
+        startTime.setMinute(0);
+        endTime.setMinute(0);
 
         addButton.setOnClickListener(v -> {
             ArrayList<Schedule> schedules = new ArrayList<>();
