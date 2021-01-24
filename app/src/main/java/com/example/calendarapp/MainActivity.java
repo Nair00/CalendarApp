@@ -8,64 +8,105 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.tlaabs.timetableview.Schedule;
-import com.github.tlaabs.timetableview.Time;
 import com.github.tlaabs.timetableview.TimetableView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TimetableView timetableView;
+    static TimetableView timetableView;
     FloatingActionButton fab;
+    Calendar calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+        addTasks();
     }
 
     private void init(){
+        calendar = Calendar.getInstance(TimeZone.getDefault());
         timetableView = findViewById(R.id.timetable);
         fab = findViewById(R.id.add_task_button);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
-                startActivity(intent);
-            }
+        fab.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
+            startActivity(intent);
         });
 
-        timetableView.setHeaderHighlight(Calendar.DAY_OF_WEEK - 1);
-        timetableView.setOnStickerSelectEventListener(new TimetableView.OnStickerSelectedListener() {
-            @Override
-            public void OnStickerSelected(int idx, ArrayList<Schedule> schedules) {
-            }
+        timetableView.setHeaderHighlight(calendar.get(Calendar.DAY_OF_WEEK));
+        timetableView.setOnStickerSelectEventListener((idx, schedules) -> {
+            timetableView.remove(idx);
+            saveTimetable();
         });
-        addTask();
     }
 
     @Override
     public void onClick(View v){
-        Toast toast = Toast.makeText(getApplicationContext(), "CLICK!", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), "CLICK!", Toast.LENGTH_LONG);
         toast.show();
     }
 
-    private void addTask(){
-        ArrayList<Schedule> schedules = new ArrayList<Schedule>();
+    private void addTasks(){
+        loadTimetable();
+    }
 
-        Schedule schedule = new Schedule();
-        schedule.setClassTitle("Data Structure"); // sets subject
-        schedule.setClassPlace("IT-601"); // sets place
-        schedule.setProfessorName("Won Kim"); // sets professor
-        schedule.setStartTime(new Time(10,0)); // sets the beginning of class time (hour,minute)
-        schedule.setEndTime(new Time(13,30)); // sets the end of class time (hour,minute)
-        schedules.add(schedule);
+    private void saveTimetable(){
+        String json = timetableView.createSaveData();
 
-        timetableView.add(schedules);
-//.. add one or more schedules
+        try {
+            File file = new File(getApplicationContext().getFilesDir(), "SaveData");
+            FileWriter fileWriter = new FileWriter(file);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(json);
+            bufferedWriter.close();
+        }catch (IOException e){
+            Toast toast = Toast.makeText(getApplicationContext(), "Save went wrong!", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
+    private void loadTimetable(){
+        File file = new File(getApplicationContext().getFilesDir(),"SaveData");
+        FileReader fileReader;
+        try {
+            fileReader = new FileReader(file);
+        }catch (FileNotFoundException e){
+            Toast toast = Toast.makeText(getApplicationContext(), "Save data not found!", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        try {
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line = bufferedReader.readLine();
+            while (line != null) {
+                stringBuilder.append(line).append("\n");
+                line = bufferedReader.readLine();
+            }
+            bufferedReader.close();
+            String json = stringBuilder.toString();
+            timetableView.load(json);
+        }catch (IOException e){
+            Toast toast = Toast.makeText(getApplicationContext(), "Loading data went wrong!", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveTimetable();
     }
 }
